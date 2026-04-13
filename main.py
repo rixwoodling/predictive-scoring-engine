@@ -50,6 +50,7 @@ def run_eda(df, target_col):
     ptx.clear_figure()
     ptx.bar(counts.index.astype(str), counts.values)
     ptx.title(f"{target_col} Distribution")
+    ptx.plotsize(60, 15)
     ptx.show()
     # Save high-quality plot for artifacts
     sns.countplot(x=target_col, data=df)
