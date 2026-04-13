@@ -62,16 +62,6 @@ def run_eda(df, target_col):
     plt.savefig("target_distribution.png", dpi=300, bbox_inches="tight")
     plt.close()
 
-# Print ASCII bar chart with stars
-def print_ascii_bar(y):
-    counts = y.value_counts().sort_index()
-    max_count = counts.max()
-
-    for label, count in counts.items():
-        bar_len = int((count / max_count) * 20)
-        bar = "*" * bar_len
-        print(f"{str(label):<6} | {count:<5} {bar}")
-
 # Split features and target
 def split_features_target(df, target_col):
     X = df.drop(target_col, axis=1)
@@ -80,6 +70,7 @@ def split_features_target(df, target_col):
     if y.dtype == "object":
         y = y.astype("category").cat.codes
     return X, y
+    print(X, y),""
 
 # Identify numeric and categorical columns
 def get_column_types(X):
