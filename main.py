@@ -42,11 +42,19 @@ def run_eda(df, target_col):
     print("\nMISSING VALUES")
     print(df.isnull().sum())
     # Plot and save target distribution
+    # Compute target distribution
+    counts = df[target_col].value_counts().sort_index()
+    # CLI bar chart (non-blocking, stays in terminal)
+    print("\nTARGET DISTRIBUTION (CLI)\n")
+    ptx.clear_figure()
+    ptx.bar(counts.index.astype(str), counts.values)
+    ptx.title(f"{target_col} Distribution")
+    ptx.show()
+    # Save high-quality plot for artifacts
     sns.countplot(x=target_col, data=df)
     plt.title(f"{target_col} Distribution")
     plt.savefig("target_distribution.png", dpi=300, bbox_inches="tight")
-    plt.show(block=False)
-    plt.pause(0.1)
+    plt.close()
 
 # Split features and target
 def split_features_target(df, target_col):
