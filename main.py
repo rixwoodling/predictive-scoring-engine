@@ -67,16 +67,12 @@ def split_features_target(df, target_col):
     # Convert target to numeric if needed
     if y.dtype == "object":
         y = y.astype("category").cat.codes
-    print(X, y)
     return X, y
 
 # Identify numeric and categorical columns
 def get_column_types(X):
     num_cols = X.select_dtypes(include=["int64", "float64"]).columns
     cat_cols = X.select_dtypes(include=["object"]).columns
-    
-    print("\nNUMERIC:", ", ".join(num_cols))
-    print("CATEGORICAL:", ", ".join(cat_cols))
     return num_cols, cat_cols
 
 # Build preprocessing + model pipeline
