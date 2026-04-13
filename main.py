@@ -46,11 +46,7 @@ def run_eda(df, target_col):
     # Compute target distribution
     counts = df[target_col].value_counts().sort_index()
     # CLI bar chart (non-blocking, stays in terminal)
-    print("\nTARGET DISTRIBUTION (CLI)\n")
-    data = [
-        ("0", 3849),
-        ("1", 1151),
-    ]
+    print("\nTARGET DISTRIBUTION (CLI)")
     asciibars.plot(data)
 
 # 
