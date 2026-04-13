@@ -48,7 +48,7 @@ def run_eda(df, target_col):
     # Convert to asciibars format: list of (label, value)
     data = [(str(label), int(count)) for label, count in counts.items()]
     # CLI bar chart
-    print("\nTARGET DISTRIBUTION (ASCII)")
+    print("\nTARGET DISTRIBUTION")
     max_count = max(v for _, v in data)
 
     for label, count in data:
