@@ -17,14 +17,11 @@ def load_data():
 # Detect binary columns and prompt user to select target
 def select_target_column(df):
     binary_cols = [col for col in df.columns if df[col].nunique() == 2]
-
     if not binary_cols:
         raise ValueError("No binary columns found in dataset.")
-
     print("\nDetected binary columns:")
     for i, col in enumerate(binary_cols):
         print(f"{i}: {col}")
-
     while True:
         try:
             choice = int(input("\nSelect target column index: "))
