@@ -2,7 +2,7 @@ import pandas as pd
 import joblib
 import seaborn as sns
 import matplotlib.pyplot as plt
-import plotext as ptx
+import asciibars
 
 from sklearn.impute import SimpleImputer
 from sklearn.model_selection import train_test_split
@@ -47,16 +47,21 @@ def run_eda(df, target_col):
     counts = df[target_col].value_counts().sort_index()
     # CLI bar chart (non-blocking, stays in terminal)
     print("\nTARGET DISTRIBUTION (CLI)\n")
-    ptx.clear_figure()
-    ptx.bar(counts.index.astype(str), counts.values)
-    ptx.title(f"{target_col} Distribution")
-    ptx.plotsize(60, 15)
-    ptx.show()
-    # Save high-quality plot for artifacts
-    sns.countplot(x=target_col, data=df)
-    plt.title(f"{target_col} Distribution")
-    plt.savefig("target_distribution.png", dpi=300, bbox_inches="tight")
-    plt.close()
+    data = [
+        ("0", 3849),
+        ("1", 1151),
+    ]
+    asciibars.plot(data)
+
+# 
+def print_ascii_bar(y):
+    counts = y.value_counts().sort_index()
+    max_count = counts.max()
+
+    for label, count in counts.items():
+        bar_len = int((count / max_count) * 20)
+        bar = "█" * bar_len
+        print(f"{str(label):<2} {bar:<20} {count}")
 
 # Split features and target
 def split_features_target(df, target_col):
