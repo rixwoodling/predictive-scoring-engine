@@ -49,7 +49,13 @@ def run_eda(df, target_col):
     data = [(str(label), int(count)) for label, count in counts.items()]
     # CLI bar chart
     print("\nTARGET DISTRIBUTION (ASCII)")
-    asciibars.plot(data)
+    max_count = max(v for _, v in data)
+
+    for label, count in data:
+        bar_len = int((count / max_count) * 20)
+        bar = "*" * bar_len
+        print(f"{label:<6} | {count:<5} {bar}")
+        
     # Save matplotlib plot (non-blocking)
     sns.countplot(x=target_col, data=df)
     plt.title(f"{target_col} Distribution")
