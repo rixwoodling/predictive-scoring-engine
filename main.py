@@ -87,8 +87,8 @@ def split_features_target(df, target_col):
 def get_column_types(X):
     num_cols = X.select_dtypes(include=["int64", "float64"]).columns
     cat_cols = X.select_dtypes(include=["object"]).columns
-    return num_cols, cat_cols
     print(num_cols, cat_cols)
+    return num_cols, cat_cols
 
 # Build preprocessing + model pipeline
 def build_pipeline(num_cols, cat_cols):
