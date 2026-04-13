@@ -48,7 +48,7 @@ def run_eda(df, target_col):
     # Convert to asciibars format: list of (label, value)
     data = [(str(label), int(count)) for label, count in counts.items()]
     # CLI bar chart
-    print("\nTARGET DISTRIBUTION (ASCII)\n")
+    print("\nTARGET DISTRIBUTION (ASCII)")
     asciibars.plot(data)
     # Save matplotlib plot (non-blocking)
     sns.countplot(x=target_col, data=df)
