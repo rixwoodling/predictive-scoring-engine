@@ -42,22 +42,19 @@ def run_eda(df, target_col):
 
     print("\nMISSING VALUES")
     print(df.isnull().sum())
-    # Plot and save target distribution
+    
     # Compute target distribution
     counts = df[target_col].value_counts().sort_index()
-    # CLI bar chart (non-blocking, stays in terminal)
-    print("\nTARGET DISTRIBUTION (CLI)")
+    # Convert to asciibars format: list of (label, value)
+    data = [(str(label), int(count)) for label, count in counts.items()]
+    # CLI bar chart
+    print("\nTARGET DISTRIBUTION (ASCII)\n")
     asciibars.plot(data)
-
-# 
-def print_ascii_bar(y):
-    counts = y.value_counts().sort_index()
-    max_count = counts.max()
-
-    for label, count in counts.items():
-        bar_len = int((count / max_count) * 20)
-        bar = "█" * bar_len
-        print(f"{str(label):<2} {bar:<20} {count}")
+    # Save matplotlib plot (non-blocking)
+    sns.countplot(x=target_col, data=df)
+    plt.title(f"{target_col} Distribution")
+    plt.savefig("target_distribution.png", dpi=300, bbox_inches="tight")
+    plt.close()
 
 # Split features and target
 def split_features_target(df, target_col):
