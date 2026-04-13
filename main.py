@@ -43,11 +43,9 @@ def run_eda(df, target_col):
     print("\nMISSING VALUES")
     print(df.isnull().sum())
     
-    # Compute target distribution
+    # Compute target distribution, convert to asciibars format, print:
     counts = df[target_col].value_counts().sort_index()
-    # Convert to asciibars format: list of (label, value)
     data = [(str(label), int(count)) for label, count in counts.items()]
-    # CLI bar chart
     print("\nTARGET DISTRIBUTION")
     max_count = max(v for _, v in data)
 
@@ -75,7 +73,7 @@ def split_features_target(df, target_col):
 def get_column_types(X):
     num_cols = X.select_dtypes(include=["int64", "float64"]).columns
     cat_cols = X.select_dtypes(include=["object"]).columns
-
+    
     print("\nNUMERIC:", ", ".join(num_cols))
     print("CATEGORICAL:", ", ".join(cat_cols))
     return num_cols, cat_cols
@@ -86,7 +84,6 @@ def build_pipeline(num_cols, cat_cols):
         ("num", StandardScaler(), num_cols),
         ("cat", OneHotEncoder(handle_unknown="ignore"), cat_cols)
     ])
-
     return Pipeline([
         ("preprocessor", preprocessor),
         ("model", RandomForestClassifier())
@@ -113,9 +110,9 @@ def main():
     df = load_data()
     target_col = select_target_column(df)
     run_eda(df, target_col)
-
     X, y = split_features_target(df, target_col)
     num_cols, cat_cols = get_column_types(X)
+    
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42
     )
