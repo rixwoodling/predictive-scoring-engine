@@ -33,13 +33,13 @@ def select_target_column(df):
 # Run basic EDA and save target distribution plot
 def run_eda(df, target_col):
     # Print structure, stats, and missing values
-    print("\nDATA INFO\n")
+    print("\nDATA INFO")
     df.info()
 
-    print("\nDESCRIBE\n")
+    print("\nDESCRIBE")
     print(df.describe().round(3))
 
-    print("\nMISSING VALUES\n")
+    print("\nMISSING VALUES")
     print(df.isnull().sum())
     # Plot and save target distribution
     sns.countplot(x=target_col, data=df)
