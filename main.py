@@ -70,7 +70,6 @@ def split_features_target(df, target_col):
     if y.dtype == "object":
         y = y.astype("category").cat.codes
     return X, y
-    print(X, y),""
 
 # Identify numeric and categorical columns
 def get_column_types(X):
@@ -113,6 +112,7 @@ def main():
     run_eda(df, target_col)
 
     X, y = split_features_target(df, target_col)
+    print(split_features_target)
     num_cols, cat_cols = get_column_types(X)
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42
