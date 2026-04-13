@@ -62,6 +62,18 @@ def run_eda(df, target_col):
     plt.savefig("target_distribution.png", dpi=300, bbox_inches="tight")
     plt.close()
 
+# Display numeric and categorical columns side-by-side
+def print_column_types(num_cols, cat_cols):
+    print("\nCOLUMN TYPES\n")
+    print(f"{'NUMERIC':<20} | {'CATEGORICAL'}")
+    print("-" * 35)
+    
+    max_len = max(len(num_cols), len(cat_cols))
+    for i in range(max_len):
+        num = num_cols[i] if i < len(num_cols) else ""
+        cat = cat_cols[i] if i < len(cat_cols) else ""
+        print(f"{num:<20} | {cat}")
+
 # Split features and target
 def split_features_target(df, target_col):
     X = df.drop(target_col, axis=1)
@@ -76,6 +88,7 @@ def get_column_types(X):
     num_cols = X.select_dtypes(include=["int64", "float64"]).columns
     cat_cols = X.select_dtypes(include=["object"]).columns
     return num_cols, cat_cols
+    print(num_cols, cat_cols)
 
 # Build preprocessing + model pipeline
 def build_pipeline(num_cols, cat_cols):
