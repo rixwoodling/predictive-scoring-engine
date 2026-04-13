@@ -76,15 +76,8 @@ def get_column_types(X):
     num_cols = X.select_dtypes(include=["int64", "float64"]).columns
     cat_cols = X.select_dtypes(include=["object"]).columns
 
-    print("\nCOLUMN TYPES\n")
-    print(f"{'NUMERIC':<20} | {'CATEGORICAL'}")
-    print("-" * 35)
-
-    max_len = max(len(num_cols), len(cat_cols))
-    for i in range(max_len):
-        num = num_cols[i] if i < len(num_cols) else ""
-        cat = cat_cols[i] if i < len(cat_cols) else ""
-        print(f"{num:<20} | {cat}")
+    print("\nNUMERIC:", ", ".join(num_cols))
+    print("CATEGORICAL:", ", ".join(cat_cols))
     return num_cols, cat_cols
 
 # Build preprocessing + model pipeline
