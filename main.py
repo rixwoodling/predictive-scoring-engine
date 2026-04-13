@@ -11,7 +11,7 @@ from sklearn.metrics import accuracy_score
 
 # Load dataset from CSV
 def load_data():
-    return pd.read_csv("data.csv")
+    return pd.read_csv("csv/loan_data.csv")
 
 
 # Build preprocessing + model pipeline
