@@ -67,6 +67,7 @@ def split_features_target(df, target_col):
     # Convert target to numeric if needed
     if y.dtype == "object":
         y = y.astype("category").cat.codes
+    print(X, y)
     return X, y
 
 # Identify numeric and categorical columns
