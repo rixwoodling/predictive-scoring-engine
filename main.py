@@ -3,6 +3,7 @@ import joblib
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+from sklearn.impute import SimpleImputer
 from sklearn.model_selection import train_test_split
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
@@ -32,7 +33,9 @@ def select_target_column(df):
 # Run basic EDA and save target distribution plot
 def run_eda(df, target_col):
     # Print structure, stats, and missing values
-    print(df.info(), df.describe(), df.isnull().sum())
+    df.info()
+    print(df.describe())
+    print(df.isnull().sum())
     # Plot and save target distribution
     sns.countplot(x=target_col, data=df)
     plt.title(f"{target_col} Distribution")
