@@ -108,7 +108,7 @@ def train_model(pipeline, X_train, y_train):
 def evaluate_model(model, X_test, y_test):
     preds = model.predict(X_test)
     acc = accuracy_score(y_test, preds)
-    print(f"Accuracy: {acc:.3f}")
+    print(f"\nAccuracy: {acc:.3f}")
 
 # Save trained model
 def save_model(model):
