@@ -82,6 +82,7 @@ def save_model(model):
 def main():
     print("Predictive Scoring Engine (ML Pipeline)")
     df = load_data()
+    print(df.head())
     target_col = select_target_column(df)
     X, y = split_features_target(df, target_col)
     num_cols, cat_cols = get_column_types(X)
