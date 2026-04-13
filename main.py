@@ -46,11 +46,9 @@ def run_eda(df, target_col):
 def split_features_target(df, target_col):
     X = df.drop(target_col, axis=1)
     y = df[target_col]
-
     # Convert target to numeric if needed
     if y.dtype == "object":
         y = y.astype("category").cat.codes
-
     return X, y
 
 # Identify numeric and categorical columns
