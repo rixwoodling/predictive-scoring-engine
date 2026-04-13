@@ -2,6 +2,7 @@ import pandas as pd
 import joblib
 import seaborn as sns
 import matplotlib.pyplot as plt
+import plotext as ptx
 
 from sklearn.impute import SimpleImputer
 from sklearn.model_selection import train_test_split
