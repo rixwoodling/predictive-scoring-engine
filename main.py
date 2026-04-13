@@ -11,10 +11,6 @@ from sklearn.metrics import accuracy_score
 # Load dataset from CSV
 def load_data():
     return pd.read_csv("csv/loan_data.csv")
-    # Print basic preview for sanity check
-    print("\nData Preview:")
-    print(df.head())
-    return df
 
 # Detect binary columns and prompt user to select target
 def select_target_column(df):
