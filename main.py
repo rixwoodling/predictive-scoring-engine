@@ -85,10 +85,9 @@ def save_model(model):
 def main():
     print("Predictive Scoring Engine (ML Pipeline)")
     df = load_data()
-    print(df.head())
-    run_eda(df, target_col)
-    
     target_col = select_target_column(df)
+    run_eda(df, target_col)
+
     X, y = split_features_target(df, target_col)
     num_cols, cat_cols = get_column_types(X)
     X_train, X_test, y_train, y_test = train_test_split(
