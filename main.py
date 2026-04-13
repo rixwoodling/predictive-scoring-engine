@@ -1,5 +1,7 @@
 import pandas as pd
 import joblib
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 from sklearn.model_selection import train_test_split
 from sklearn.compose import ColumnTransformer
@@ -29,6 +31,16 @@ def select_target_column(df):
             return binary_cols[choice]
         except (ValueError, IndexError):
             print("Invalid selection. Try again.")
+            
+# Run basic EDA and save target distribution plot
+def run_eda(df, target_col):
+    # Print structure, stats, and missing values
+    print(df.info(), df.describe(), df.isnull().sum())
+    # Plot and save target distribution
+    sns.countplot(x=target_col, data=df)
+    plt.title(f"{target_col} Distribution")
+    plt.savefig("target_distribution.png", dpi=300, bbox_inches="tight")
+    plt.show()
 
 # Split features and target
 def split_features_target(df, target_col):
