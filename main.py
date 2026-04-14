@@ -209,7 +209,7 @@ def main():
         num_cols, cat_cols, X_train, X_test, y_train, y_test
     )
     
-    evaluate_pipeline(best_pipeline, X_test, y_test)
+    evaluate_model(best_pipeline, X_test, y_test)
     save_model(best_pipeline)
     
 if __name__ == "__main__":
