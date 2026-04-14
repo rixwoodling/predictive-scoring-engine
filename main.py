@@ -2,7 +2,7 @@ import pandas as pd
 import joblib
 import seaborn as sns
 import matplotlib.pyplot as plt
-import asciibars
+import random
 import numpy as np
 
 from sklearn.impute import SimpleImputer
@@ -18,7 +18,11 @@ from sklearn.svm import SVC
 
 # Load dataset from CSV
 def load_data():
-    return pd.read_csv("csv/loan_data.csv")
+    datasets = sns.get_dataset_names()
+    datasets = list(set(datasets))
+    name = random.choice(datasets)
+    print(f"\nLoaded dataset: {name}")
+    return sns.load_dataset(name)
 
 # Detect binary columns and prompt user to select target
 def select_target_column(df):
