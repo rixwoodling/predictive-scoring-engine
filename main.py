@@ -37,19 +37,24 @@ def select_target_column(df):
             
 # Run basic EDA and save target distribution plot
 def run_eda(df, target_col):
-    # Print structure, stats, and missing values
-    print("\nDATA INFO")
-    df.info()
+    overview = df.dtypes.to_frame(name="Dtype")
+    overview["Non-Null"] = df.count()
+    overview["Missing"] = df.isnull().sum()
+    overview["Missing %"] = (overview["Missing"] / len(df) * 100).round(2)
 
+    print("\nDATA OVERVIEW")
+    print(overview)
+
+    print(f"\nMemory usage: {df.memory_usage(deep=True).sum() / 1024:.1f} KB")
+
+    # ---- DESCRIPTIVE STATS ----
     print("\nDESCRIBE")
     print(df.describe().round(3))
 
-    print("\nMISSING VALUES")
-    print(df.isnull().sum())
-    
-    # Compute target distribution, convert to asciibars format, print:
+    # ---- TARGET DISTRIBUTION (ASCII) ----
     counts = df[target_col].value_counts().sort_index()
     data = [(str(label), int(count)) for label, count in counts.items()]
+
     print("\nTARGET DISTRIBUTION")
     max_count = max(v for _, v in data)
 
@@ -57,8 +62,8 @@ def run_eda(df, target_col):
         bar_len = int((count / max_count) * 20)
         bar = "*" * bar_len
         print(f"{label:<6} | {count:<5} {bar}")
-        
-    # Save matplotlib plot (non-blocking)
+
+    # ---- TARGET DISTRIBUTION PLOT ----
     sns.countplot(x=target_col, data=df)
     plt.title(f"{target_col} Distribution")
     plt.savefig("target_distribution.png", dpi=300, bbox_inches="tight")
