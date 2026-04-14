@@ -157,6 +157,43 @@ def evaluate_model(model, X_test, y_test):
     acc = accuracy_score(y_test, preds)
     print(f"\nAccuracy: {acc:.3f}")
 
+# 
+def compare_models(models, preprocessor, X_train, X_test, y_train, y_test):
+    results = []
+    best_score = 0
+    best_model = None
+
+    for name, model in models.items():
+        pipe = Pipeline([
+            ("preprocessor", preprocessor),
+            ("model", model)
+        ])
+        pipe.fit(X_train, y_train)
+        y_pred = pipe.predict(X_test)
+
+        if hasattr(pipe.named_steps["model"], "predict_proba"):
+            y_proba = pipe.predict_proba(X_test)[:, 1]
+        else:
+            y_proba = pipe.decision_function(X_test)
+
+        acc = accuracy_score(y_test, y_pred)
+        roc = roc_auc_score(y_test, y_proba)
+        print(f"{name} → Accuracy: {acc:.4f} | ROC-AUC: {roc:.4f}")
+
+        results.append({
+            "Model": name,
+            "Accuracy": acc,
+            "ROC-AUC": roc
+        })
+        if roc > best_score:
+            best_score = roc
+            best_model = pipe
+
+    df_results = pd.DataFrame(results).sort_values("ROC-AUC", ascending=False)
+    print("\nMODEL COMPARISON")
+    print(df_results)
+    return best_model
+
 # Save trained model
 def save_model(model):
     joblib.dump(model, "model.pkl")
