@@ -90,10 +90,6 @@ def build_pipeline(num_cols, cat_cols):
         ("num", numeric_transformer, num_cols),
         ("cat", categorical_transformer, cat_cols)
     ])
-    return Pipeline([
-        ("preprocessor", preprocessor),
-        ("model", RandomForestClassifier())
-    ])
     # Verification block
     X_transformed = preprocessor.fit_transform(X)
     print("\nPIPELINE VERIFICATION")
