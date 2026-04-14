@@ -130,7 +130,7 @@ def main():
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42
     )
-    pipeline = build_pipeline(num_cols, cat_cols)
+    pipeline = build_pipeline(num_cols, cat_cols, X)
     model = train_model(pipeline, X_train, y_train)
     evaluate_model(model, X_test, y_test)
     save_model(model)
