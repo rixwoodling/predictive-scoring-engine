@@ -216,8 +216,9 @@ def main():
 
     pipeline = build_pipeline(num_cols, cat_cols, best_model)
     pipeline = train_model(pipeline, X_train, y_train)
-    evaluate_model(pipeline, X_test, y_test)
-    save_model(pipeline)
+    best_model = compare_models(models, preprocessor, X_train, X_test, y_train, y_test)
+    evaluate_model(best_model, X_test, y_test)
+    save_model(best_model)
     
 if __name__ == "__main__":
     main()
