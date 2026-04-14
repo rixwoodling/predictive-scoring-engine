@@ -184,7 +184,7 @@ def train_model(pipeline, X_train, y_train):
     return pipeline
 
 # Evaluate model
-def evaluate_model(model, X_test, y_test):
+def evaluate_pipeline(model, X_test, y_test):
     preds = model.predict(X_test)
     acc = accuracy_score(y_test, preds)
     print(f"\nAccuracy: {acc:.3f}")
@@ -209,7 +209,7 @@ def main():
         num_cols, cat_cols, X_train, X_test, y_train, y_test
     )
     
-    evaluate_model(best_pipeline, X_test, y_test)
+    evaluate_pipeline(best_pipeline, X_test, y_test)
     save_model(best_pipeline)
     
 if __name__ == "__main__":
