@@ -96,7 +96,6 @@ def build_pipeline(num_cols, cat_cols, X):
     print("Original:", X.shape)
     print("Transformed:", X_transformed.shape)
     print("Any NaNs?", np.isnan(X_transformed).any())
-    print("First row:", X_transformed[0])
 
     return Pipeline([
         ("preprocessor", preprocessor),
