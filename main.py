@@ -77,7 +77,7 @@ def get_column_types(X):
     return num_cols, cat_cols
 
 # Build preprocessing + model pipeline
-def build_pipeline(num_cols, cat_cols):
+def build_pipeline(num_cols, cat_cols, X):
     numeric_transformer = Pipeline([
         ("imputer", SimpleImputer(strategy="median")),
         ("scaler", StandardScaler())
