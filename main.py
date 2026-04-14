@@ -80,6 +80,8 @@ def run_eda(df, target_col):
 
 # Split features and target
 def split_features_target(df, target_col):
+    df = df[df[target_col].notna()]
+    
     X = df.drop(target_col, axis=1)
     y = df[target_col]
     # Convert target to numeric if needed
