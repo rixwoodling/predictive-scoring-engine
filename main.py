@@ -17,17 +17,12 @@ from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.svm import SVC
 
 def load_data():
-    while True:
-        name = random.choice(sns.get_dataset_names())
-        df = sns.load_dataset(name)
-        # check for binary column
-        binary_cols = [
-            col for col in df.columns
-            if df[col].nunique() == 2
-        ]
-        if binary_cols:
-            print(f"\nLoaded dataset: {name}")
-            return df
+    datasets = ["titanic", "penguins", "tips", "iris"]
+    name = random.choice(datasets)
+    
+    df = sns.load_dataset(name)
+    print(f"\nLoaded dataset: {name}")
+    return df
 
 # Detect binary columns and prompt user to select target
 def select_target_column(df):
