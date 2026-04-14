@@ -116,15 +116,35 @@ def build_pipeline(num_cols, cat_cols, model):
         ("model", model)
     ])
 
-def choose_model(num_cols, cat_cols, X_train, X_test, y_train, y_test):
-    models = {
+def get_models():
+    return {
         "Logistic Regression": LogisticRegression(max_iter=1000),
-        "Decision Tree": DecisionTreeClassifier(),
-        "Random Forest": RandomForestClassifier(),
-        "Gradient Boosting": GradientBoostingClassifier(),
+        "Decision Tree": DecisionTreeClassifier(random_state=42),
+        "Random Forest": RandomForestClassifier(random_state=42),
+        "Gradient Boosting": GradientBoostingClassifier(random_state=42),
         "SVM": SVC(probability=True)
     }
 
+def evaluate_pipeline(pipeline, X_test, y_test):
+    y_pred = pipeline.predict(X_test)
+
+    if hasattr(pipeline.named_steps["model"], "predict_proba"):
+        y_proba = pipeline.predict_proba(X_test)[:, 1]
+    else:
+        y_proba = pipeline.decision_function(X_test)
+
+    return {
+        "Accuracy": accuracy_score(y_test, y_pred),
+        "Precision": precision_score(y_test, y_pred, average="weighted"),
+        "Recall": recall_score(y_test, y_pred, average="weighted"),
+        "F1": f1_score(y_test, y_pred, average="weighted"),
+        "ROC-AUC": roc_auc_score(y_test, y_proba)
+    }
+
+def choose_model(num_cols, cat_cols, X_train, X_test, y_train, y_test):
+    models = get_models()
+
+    results = []
     best_model = None
     best_score = -1
     best_name = ""
@@ -133,27 +153,26 @@ def choose_model(num_cols, cat_cols, X_train, X_test, y_train, y_test):
 
     for name, model in models.items():
         pipeline = build_pipeline(num_cols, cat_cols, model)
-
         pipeline.fit(X_train, y_train)
-        # Accuracy
-        acc = pipeline.score(X_test, y_test)
-        # Predictions for ROC
-        y_pred = pipeline.predict(X_test)
 
-        if hasattr(pipeline.named_steps["model"], "predict_proba"):
-            y_proba = pipeline.predict_proba(X_test)[:, 1]
-        else:
-            y_proba = pipeline.decision_function(X_test)
+        metrics = evaluate_pipeline(pipeline, X_test, y_test)
 
-        roc = roc_auc_score(y_test, y_proba)
+        print(f"{name} → Accuracy: {metrics['Accuracy']:.4f} | ROC-AUC: {metrics['ROC-AUC']:.4f}")
 
-        print(f"{name} → Accuracy: {acc:.4f} | ROC-AUC: {roc:.4f}")
-        # choose best based on ROC (better than accuracy)
-        if roc > best_score:
-            best_score = roc
+        results.append({"Model": name, **metrics})
+
+        if metrics["ROC-AUC"] > best_score:
+            best_score = metrics["ROC-AUC"]
             best_model = model
             best_name = name
+
+    df_results = pd.DataFrame(results).sort_values("ROC-AUC", ascending=False)
+
+    print("\nFinal Results:")
+    print(df_results.round(3))
+
     print(f"\nBest model: {best_name}")
+
     return best_model
 
 # Train model
@@ -183,14 +202,12 @@ def main():
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42, stratify=y
     )
-    best_model = choose_model(
+    best_pipeline = choose_model(
         num_cols, cat_cols, X_train, X_test, y_train, y_test
     )
-
-    pipeline = build_pipeline(num_cols, cat_cols, best_model)
-    pipeline = train_model(pipeline, X_train, y_train)
-    evaluate_model(pipeline, X_test, y_test)
-    save_model(pipeline)
+    
+    evaluate_model(best_pipeline, X_test, y_test)
+    save_model(best_pipeline)
     
 if __name__ == "__main__":
     main()
