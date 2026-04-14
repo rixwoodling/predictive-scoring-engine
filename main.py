@@ -97,27 +97,14 @@ def build_pipeline(num_cols, cat_cols, model):
         ("model", model)
     ])
 
-def verify_pipeline(num_cols, cat_cols, X):
-    numeric_transformer = Pipeline([
-        ("imputer", SimpleImputer(strategy="median")),
-        ("scaler", StandardScaler())
-    ])
-    categorical_transformer = Pipeline([
-        ("imputer", SimpleImputer(strategy="most_frequent")),
-        ("onehot", OneHotEncoder(handle_unknown="ignore"))
-    ])
-    preprocessor = ColumnTransformer([
-        ("num", numeric_transformer, num_cols),
-        ("cat", categorical_transformer, cat_cols)
-    ])
-    X_transformed = preprocessor.fit_transform(X)
-
-    print("\nPIPELINE VERIFICATION")
-    print("Original:", X.shape)
-    print("Transformed:", X_transformed.shape)
-    print("Missing after pipeline?", np.isnan(X_transformed).any())
-
-def pick_best_model(models, num_cols, cat_cols, X_train, X_test, y_train, y_test):
+def choose_model(num_cols, cat_cols, X_train, X_test, y_train, y_test):
+    models = {
+        "Logistic Regression": LogisticRegression(max_iter=1000),
+        "Decision Tree": DecisionTreeClassifier(),
+        "Random Forest": RandomForestClassifier(),
+        "Gradient Boosting": GradientBoostingClassifier(),
+        "SVM": SVC(probability=True)
+    }
     best_model = None
     best_score = -1
     best_name = ""
@@ -126,6 +113,7 @@ def pick_best_model(models, num_cols, cat_cols, X_train, X_test, y_train, y_test
 
     for name, model in models.items():
         pipeline = build_pipeline(num_cols, cat_cols, model)
+
         pipeline.fit(X_train, y_train)
         acc = pipeline.score(X_test, y_test)
 
@@ -135,7 +123,7 @@ def pick_best_model(models, num_cols, cat_cols, X_train, X_test, y_train, y_test
             best_score = acc
             best_model = model
             best_name = name
-            
+
     print(f"\nBest model: {best_name}")
     return best_model
 
@@ -163,39 +151,16 @@ def main():
     X, y = split_features_target(df, target_col)
     num_cols, cat_cols = get_column_types(X)
     
-    # 6. Train-test split
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42, stratify=y
     )
-
-    # 7. Optional: verify preprocessing (training data only)
-    verify_pipeline(num_cols, cat_cols, X_train)
-
-    # 8. Define candidate models
-    models = {
-        "Logistic Regression": LogisticRegression(max_iter=1000),
-        "Decision Tree": DecisionTreeClassifier(),
-        "Random Forest": RandomForestClassifier(),
-        "Gradient Boosting": GradientBoostingClassifier(),
-        "SVM": SVC(probability=True)
-    }
-
-    # 9. Pick best model
-    best_model = pick_best_model(
-        models, num_cols, cat_cols,
-        X_train, X_test, y_train, y_test
+    best_model = choose_model(
+        num_cols, cat_cols, X_train, X_test, y_train, y_test
     )
 
-    # 10. Build final pipeline
     pipeline = build_pipeline(num_cols, cat_cols, best_model)
-
-    # 11. Train final model
     pipeline = train_model(pipeline, X_train, y_train)
-
-    # 12. Evaluate final model
     evaluate_model(pipeline, X_test, y_test)
-
-    # 13. Save model
     save_model(pipeline)
     
 if __name__ == "__main__":
