@@ -11,7 +11,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
+from sklearn.metrics import accuracy_score
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
@@ -124,51 +124,27 @@ def choose_model(num_cols, cat_cols, X_train, X_test, y_train, y_test):
         "Gradient Boosting": GradientBoostingClassifier(),
         "SVM": SVC(probability=True)
     }
-
-    results = []
+    best_model = None
     best_score = -1
-    best_pipeline = None
     best_name = ""
 
     print("\nMODEL COMPARISON")
 
     for name, model in models.items():
-        print(f"\nTraining: {name}")
-
         pipeline = build_pipeline(num_cols, cat_cols, model)
+
         pipeline.fit(X_train, y_train)
+        acc = pipeline.score(X_test, y_test)
 
-        y_pred = pipeline.predict(X_test)
+        print(f"{name} → Accuracy: {acc:.4f}")
 
-        if hasattr(pipeline.named_steps["model"], "predict_proba"):
-            y_proba = pipeline.predict_proba(X_test)[:, 1]
-        else:
-            y_proba = pipeline.decision_function(X_test)
-        
-        acc = accuracy_score(y_test, y_pred)
-        roc = roc_auc_score(y_test, y_proba)
-
-        print(f"Done: {name} | Accuracy: {acc:.4f} | ROC-AUC: {roc:.4f}")
-
-        results.append({
-            "Model": name,
-            "Accuracy": acc,
-            "Precision": precision_score(y_test, y_pred),
-            "Recall": recall_score(y_test, y_pred),
-            "F1": f1_score(y_test, y_pred),
-            "ROC-AUC": roc
-        })
-
-        if roc > best_score:
-            best_score = roc
-            best_pipeline = pipeline
+        if acc > best_score:
+            best_score = acc
+            best_model = model
             best_name = name
 
-    df_results = pd.DataFrame(results).sort_values("ROC-AUC", ascending=False)
-    print("\nFinal Results:")
-    print(df_results)
     print(f"\nBest model: {best_name}")
-    return best_pipeline
+    return best_model
 
 # Train model
 def train_model(pipeline, X_train, y_train):
@@ -180,43 +156,6 @@ def evaluate_model(model, X_test, y_test):
     preds = model.predict(X_test)
     acc = accuracy_score(y_test, preds)
     print(f"\nAccuracy: {acc:.3f}")
-
-# 
-def compare_models(models, preprocessor, X_train, X_test, y_train, y_test):
-    results = []
-    best_score = 0
-    best_model = None
-
-    for name, model in models.items():
-        pipe = Pipeline([
-            ("preprocessor", preprocessor),
-            ("model", model)
-        ])
-        pipe.fit(X_train, y_train)
-        y_pred = pipe.predict(X_test)
-
-        if hasattr(pipe.named_steps["model"], "predict_proba"):
-            y_proba = pipe.predict_proba(X_test)[:, 1]
-        else:
-            y_proba = pipe.decision_function(X_test)
-
-        acc = accuracy_score(y_test, y_pred)
-        roc = roc_auc_score(y_test, y_proba)
-        print(f"{name} → Accuracy: {acc:.4f} | ROC-AUC: {roc:.4f}")
-
-        results.append({
-            "Model": name,
-            "Accuracy": acc,
-            "ROC-AUC": roc
-        })
-        if roc > best_score:
-            best_score = roc
-            best_model = pipe
-
-    df_results = pd.DataFrame(results).sort_values("ROC-AUC", ascending=False)
-    print("\nMODEL COMPARISON")
-    print(df_results)
-    return best_model
 
 # Save trained model
 def save_model(model):
@@ -237,12 +176,15 @@ def main():
     best_model = choose_model(
         num_cols, cat_cols, X_train, X_test, y_train, y_test
     )
-    
-    best_model = choose_model(num_cols, cat_cols, X_train, X_test, y_train, y_test)
-    evaluate_model(best_model, X_test, y_test)
-    save_model(best_model)
+
+    pipeline = build_pipeline(num_cols, cat_cols, best_model)
+    pipeline = train_model(pipeline, X_train, y_train)
+    evaluate_model(pipeline, X_test, y_test)
+    save_model(pipeline)
     
 if __name__ == "__main__":
     main()
+
+
 
 
