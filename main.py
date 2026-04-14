@@ -124,27 +124,51 @@ def choose_model(num_cols, cat_cols, X_train, X_test, y_train, y_test):
         "Gradient Boosting": GradientBoostingClassifier(),
         "SVM": SVC(probability=True)
     }
-    best_model = None
+
+    results = []
     best_score = -1
+    best_pipeline = None
     best_name = ""
 
     print("\nMODEL COMPARISON")
 
     for name, model in models.items():
+        print(f"\nTraining: {name}")
+
         pipeline = build_pipeline(num_cols, cat_cols, model)
-
         pipeline.fit(X_train, y_train)
-        acc = pipeline.score(X_test, y_test)
 
-        print(f"{name} → Accuracy: {acc:.4f}")
+        y_pred = pipeline.predict(X_test)
 
-        if acc > best_score:
-            best_score = acc
-            best_model = model
+        if hasattr(pipeline.named_steps["model"], "predict_proba"):
+            y_proba = pipeline.predict_proba(X_test)[:, 1]
+        else:
+            y_proba = pipeline.decision_function(X_test)
+        
+        acc = accuracy_score(y_test, y_pred)
+        roc = roc_auc_score(y_test, y_proba)
+
+        print(f"Done: {name} | Accuracy: {acc:.4f} | ROC-AUC: {roc:.4f}")
+
+        results.append({
+            "Model": name,
+            "Accuracy": acc,
+            "Precision": precision_score(y_test, y_pred),
+            "Recall": recall_score(y_test, y_pred),
+            "F1": f1_score(y_test, y_pred),
+            "ROC-AUC": roc
+        })
+
+        if roc > best_score:
+            best_score = roc
+            best_pipeline = pipeline
             best_name = name
 
+    df_results = pd.DataFrame(results).sort_values("ROC-AUC", ascending=False)
+    print("\nFinal Results:")
+    print(df_results)
     print(f"\nBest model: {best_name}")
-    return best_model
+    return best_pipeline
 
 # Train model
 def train_model(pipeline, X_train, y_train):
@@ -217,7 +241,7 @@ def main():
     pipeline = build_pipeline(num_cols, cat_cols, best_model)
     pipeline = train_model(pipeline, X_train, y_train)
     
-    best_model = compare_models(models, preprocessor, X_train, X_test, y_train, y_test)
+    best_model = choose_model(num_cols, cat_cols, X_train, X_test, y_train, y_test)
     evaluate_model(best_model, X_test, y_test)
     save_model(best_model)
     
