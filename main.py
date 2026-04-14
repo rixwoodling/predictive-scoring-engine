@@ -237,9 +237,6 @@ def main():
     best_model = choose_model(
         num_cols, cat_cols, X_train, X_test, y_train, y_test
     )
-
-    pipeline = build_pipeline(num_cols, cat_cols, best_model)
-    pipeline = train_model(pipeline, X_train, y_train)
     
     best_model = choose_model(num_cols, cat_cols, X_train, X_test, y_train, y_test)
     evaluate_model(best_model, X_test, y_test)
