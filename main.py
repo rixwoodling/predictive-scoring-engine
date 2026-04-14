@@ -72,7 +72,7 @@ def split_features_target(df, target_col):
 # Identify numeric and categorical columns
 def get_column_types(X):
     num_cols = X.select_dtypes(include=["int64", "float64"]).columns
-    cat_cols = X.select_dtypes(include=["object"]).columns
+    cat_cols = X.select_dtypes(include=["object", "string"]).columns
     return num_cols, cat_cols
 
 # Build preprocessing + model pipeline
