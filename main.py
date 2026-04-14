@@ -3,6 +3,7 @@ import joblib
 import seaborn as sns
 import matplotlib.pyplot as plt
 import asciibars
+import numpy as np
 
 from sklearn.impute import SimpleImputer
 from sklearn.model_selection import train_test_split
@@ -77,14 +78,34 @@ def get_column_types(X):
 
 # Build preprocessing + model pipeline
 def build_pipeline(num_cols, cat_cols):
+    numeric_transformer = Pipeline([
+        ("imputer", SimpleImputer(strategy="median")),
+        ("scaler", StandardScaler())
+    ])
+    categorical_transformer = Pipeline([
+        ("imputer", SimpleImputer(strategy="most_frequent")),
+        ("onehot", OneHotEncoder(handle_unknown="ignore"))
+    ])
     preprocessor = ColumnTransformer([
-        ("num", StandardScaler(), num_cols),
-        ("cat", OneHotEncoder(handle_unknown="ignore"), cat_cols)
+        ("num", numeric_transformer, num_cols),
+        ("cat", categorical_transformer, cat_cols)
     ])
     return Pipeline([
         ("preprocessor", preprocessor),
         ("model", RandomForestClassifier())
     ])
+    # Verification block
+    X_transformed = preprocessor.fit_transform(X)
+    print("\nPIPELINE VERIFICATION")
+    print("Original:", X.shape)
+    print("Transformed:", X_transformed.shape)
+    print("Any NaNs?", np.isnan(X_transformed).any())
+    print("First row:", X_transformed[0])
+
+    return Pipeline([
+        ("preprocessor", preprocessor),
+        ("model", RandomForestClassifier())
+    ])    
 
 # Train model
 def train_model(pipeline, X_train, y_train):
