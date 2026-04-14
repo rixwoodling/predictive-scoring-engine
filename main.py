@@ -11,7 +11,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, roc_auc_score
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
@@ -124,6 +124,7 @@ def choose_model(num_cols, cat_cols, X_train, X_test, y_train, y_test):
         "Gradient Boosting": GradientBoostingClassifier(),
         "SVM": SVC(probability=True)
     }
+
     best_model = None
     best_score = -1
     best_name = ""
@@ -134,15 +135,24 @@ def choose_model(num_cols, cat_cols, X_train, X_test, y_train, y_test):
         pipeline = build_pipeline(num_cols, cat_cols, model)
 
         pipeline.fit(X_train, y_train)
+        # Accuracy
         acc = pipeline.score(X_test, y_test)
+        # Predictions for ROC
+        y_pred = pipeline.predict(X_test)
 
-        print(f"{name} → Accuracy: {acc:.4f}")
+        if hasattr(pipeline.named_steps["model"], "predict_proba"):
+            y_proba = pipeline.predict_proba(X_test)[:, 1]
+        else:
+            y_proba = pipeline.decision_function(X_test)
 
-        if acc > best_score:
-            best_score = acc
+        roc = roc_auc_score(y_test, y_proba)
+
+        print(f"{name} → Accuracy: {acc:.4f} | ROC-AUC: {roc:.4f}")
+        # choose best based on ROC (better than accuracy)
+        if roc > best_score:
+            best_score = roc
             best_model = model
             best_name = name
-
     print(f"\nBest model: {best_name}")
     return best_model
 
