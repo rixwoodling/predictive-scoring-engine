@@ -124,21 +124,28 @@ def get_models():
         "Gradient Boosting": GradientBoostingClassifier(random_state=42),
         "SVM": SVC(probability=True)
     }
-
 def evaluate_pipeline(pipeline, X_test, y_test):
     y_pred = pipeline.predict(X_test)
-
+    # Get probability scores or decision function
     if hasattr(pipeline.named_steps["model"], "predict_proba"):
-        y_proba = pipeline.predict_proba(X_test)[:, 1]
+        y_proba = pipeline.predict_proba(X_test)
+        # handle binary vs multi-class
+        if y_proba.shape[1] == 2:
+            y_proba = y_proba[:, 1]
     else:
         y_proba = pipeline.decision_function(X_test)
+    # ROC-AUC handling (binary vs multi-class)
+    try:
+        roc = roc_auc_score(y_test, y_proba)
+    except ValueError:
+        roc = roc_auc_score(y_test, y_proba, multi_class="ovr")
 
     return {
         "Accuracy": accuracy_score(y_test, y_pred),
         "Precision": precision_score(y_test, y_pred, average="weighted"),
         "Recall": recall_score(y_test, y_pred, average="weighted"),
         "F1": f1_score(y_test, y_pred, average="weighted"),
-        "ROC-AUC": roc_auc_score(y_test, y_proba)
+        "ROC-AUC": roc
     }
 
 def choose_model(num_cols, cat_cols, X_train, X_test, y_train, y_test):
