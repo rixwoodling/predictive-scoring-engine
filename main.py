@@ -46,7 +46,19 @@ def select_target_column(df):
             return binary_cols[choice]
         except (ValueError, IndexError):
             print("Invalid selection. Try again.")
-            
+
+def drop_leakage(df, target_col):
+    drop_cols = []
+    for col in df.columns:
+        if col == target_col:
+            continue        
+        # perfect or near-perfect correlation
+        if df[col].nunique() < 10:
+            counts = df.groupby(col)[target_col].nunique()
+            if (counts == 1).all():
+                drop_cols.append(col)
+    return df.drop(columns=drop_cols), drop_cols
+
 # Run basic EDA and save target distribution plot
 def run_eda(df, target_col):
     overview = df.dtypes.to_frame(name="Dtype")
@@ -198,6 +210,9 @@ def main():
     print("Predictive Scoring Engine (ML Pipeline)")
     df = load_data()
     target_col = select_target_column(df)
+    df, dropped = drop_leakage(df, target_col)
+    print("Dropped leakage columns:", dropped)
+    
     run_eda(df, target_col)
     X, y = split_features_target(df, target_col)
     num_cols, cat_cols = get_column_types(X)
